@@ -1,0 +1,15 @@
+{
+  "server": {
+    "address": ":9090"
+  },
+  "context":{
+    "timeout":2
+  },
+  "database": {
+    "host": "remotemysql.com",
+    "port": "3306",
+    "user": "uDMFvbOlYT",
+    "pass": "xUIuE0Ebky",
+    "name": "uDMFvbOlYT"
+  }
+}
