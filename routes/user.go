@@ -2,13 +2,12 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"people/interfaces"
 	"people/models"
 	"people/utils/errors"
-	"strconv"
+	"people/utils/validators"
 )
 
 type UserHandler struct {
@@ -28,52 +27,32 @@ func NewUserHandler(r *mux.Router, us interfaces.UserService ){
 
 func (u *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.ParseInt(vars["id"], 10, 64)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	id := vars["id"]
 
 	ctx := r.Context()
 	user, err := u.UserService.Get(ctx,id)
 	if err == errors.NotFound {
-		w.WriteHeader(http.StatusNotFound)
+		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
 		return
 	}
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type","application/json")
-	buffer, err := json.Marshal(user)
-	if err!=nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
-	_, err = w.Write(buffer)
+	errors.ResponseObject(w, http.StatusOK, user);
 }
 
 func (u *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	users, err := u.UserService.List(ctx)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
 
-	buffer, err := json.Marshal(users)
-	if err != nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type","application/json")
-	_, err = w.Write(buffer)
-
+	errors.ResponseObject(w, http.StatusOK, users)
 }
 
 func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -81,22 +60,18 @@ func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 
+	if(user == models.User{} || !validators.IsEmailValid(user.Email) || user.Name == "" || user.Email == "" || user.Password == ""){
+		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
+		return
+	}
+
 	err := u.UserService.Add(ctx, &user)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s", err.Error())
+		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
 
-	buffer, err := json.Marshal(user)
-	if err != nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type","application/json")
-	_, err = w.Write(buffer)
+	errors.ResponseObject(w, http.StatusCreated, user)
 }
 
 func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -105,9 +80,14 @@ func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&user)
 
 	err := u.UserService.Update(ctx, &user)
+
+	if err == errors.NotFound {
+		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+		return
+	}
+
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "%s", err.Error())
+		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
 		return
 	}
 
@@ -116,22 +96,18 @@ func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.ParseInt(vars["id"], 10, 64)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	id := vars["id"]
 
 	ctx := r.Context()
-	_, err = u.UserService.Get(ctx, id)
+	err := u.UserService.Remove(ctx, id)
+
 	if err == errors.NotFound {
-		w.WriteHeader(http.StatusNotFound)
+		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
 		return
 	}
 
-	err = u.UserService.Remove(ctx, id)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
 
