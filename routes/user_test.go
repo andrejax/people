@@ -92,6 +92,27 @@ func TestAddUser_MissingParameters_BadRequest(t *testing.T) {
 	handler.Add(w,req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+func TestRemoveUser_Success(t *testing.T){
+	id := "1"
+	mockUserService := new(tests.UserService)
+	handler := UserHandler {
+		UserService: mockUserService,
+	}
+
+	mockUserService.On("Remove", mock.Anything, id).Return(nil)
+
+	req, err := http.NewRequest(echo.DELETE, "/users/"+id, strings.NewReader(""))
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+
+	var vars = make(map[string]string)
+	vars["id"] = id
+	req = mux.SetURLVars(req, vars)
+	handler.Remove(w,req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockUserService.AssertExpectations(t)
+}
 
 func TestUpdateUser_Success(t *testing.T){
 	mockUser := models.User{
