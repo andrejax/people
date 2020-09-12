@@ -20,17 +20,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14615b58-9eeb-4160-b19e-e3f475bde8ff" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/interfaces/user_repo.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/interfaces/user_service.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/repositories/user.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/user.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/user_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/user.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/errors/errors.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/validators/validators.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/interfaces/group_repo.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/interfaces/group_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/group.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/repositories/group.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routes/group.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/group.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaces/user_repo.go" beforeDir="false" afterPath="$PROJECT_DIR$/interfaces/user_repo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaces/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/interfaces/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/repositories/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/repositories/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/user_service_mock.go" beforeDir="false" afterPath="$PROJECT_DIR$/tests/user_service_mock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/errors/errors.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils/errors/errors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/validators/validators.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils/validators/validators.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +72,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\goran.paligora\Desktop\golang-exercise\people\routes" />
       <recent name="C:\Users\goran.paligora\Desktop\golang-exercise\people\utils\validators" />
       <recent name="C:\Users\goran.paligora\Desktop\golang-exercise\people\utils\errors" />
     </key>
@@ -87,6 +97,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="361" y="70" width="814" height="729" key="#Intentions" timestamp="1599827019621">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="70" width="814" height="729" key="#Intentions/0.0.1536.824@0.0.1536.824" timestamp="1599827019621" />
     <state x="523" y="214" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1599674995364">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -95,6 +109,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1599552021705" />
+    <state x="118" y="116" width="1376" height="566" key="dock-window-1" timestamp="1599766204315">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="118" y="116" width="1376" height="566" key="dock-window-1/0.0.1536.824@0.0.1536.824" timestamp="1599766204315" />
     <state x="611" y="173" key="refactoring.ChangeSignatureDialog" timestamp="1599760403425">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

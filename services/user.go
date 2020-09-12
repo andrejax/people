@@ -19,7 +19,7 @@ func NewUserService(ur interfaces.UserRepository, timeout time.Duration) interfa
 	}
 }
 
-func (us *UserService) Get(ctx context.Context, id int64)  (res models.User, err error) {
+func (us *UserService) Get(ctx context.Context, id string)  (res models.User, err error) {
 	ctx, cancel := context.WithTimeout(ctx, us.contextTimeout)
 	defer cancel()
 
@@ -44,10 +44,16 @@ func (us *UserService) Add(ctx context.Context, u *models.User) (err error) {
 func (us *UserService) Update(ctx context.Context, u *models.User) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, us.contextTimeout)
 	defer cancel()
+
+	_, err = us.Get(ctx, u.Id)
+	if err != nil{
+		return err
+	}
+
 	return us.userRepo.Update(ctx, u)
 }
 
-func (us *UserService) Remove(ctx context.Context, id int64) (err error) {
+func (us *UserService) Remove(ctx context.Context, id string) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, us.contextTimeout)
 	defer cancel()
 	_, err = us.userRepo.Get(ctx, id)

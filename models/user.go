@@ -1,8 +1,11 @@
 package models
 
+import "database/sql"
+
 type User struct {
-	ID         int64   `json:"id"`
-	Name       string  `json:"name"`
-	Email      string  `json:"email"`
-	Password   string  `json:"password"`
+	Id       string  `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	GroupId  sql.NullString `json:"group_id"`
 }

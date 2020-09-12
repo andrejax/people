@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"people/interfaces"
 	"people/models"
@@ -32,11 +33,13 @@ func (u *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := u.UserService.Get(ctx,id)
 	if err == errors.NotFound {
+		log.Println(err.Error())
 		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
 		return
 	}
 
 	if err != nil {
+		log.Println(err.Error())
 		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
@@ -48,6 +51,7 @@ func (u *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	users, err := u.UserService.List(ctx)
 	if err != nil {
+		log.Println(err.Error())
 		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
@@ -67,6 +71,7 @@ func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 
 	err := u.UserService.Add(ctx, &user)
 	if err != nil {
+		log.Println(err.Error())
 		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
 		return
 	}
@@ -97,7 +102,7 @@ func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (u *UserHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-
+	log.Println(id)
 	ctx := r.Context()
 	err := u.UserService.Remove(ctx, id)
 

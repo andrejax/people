@@ -52,11 +52,14 @@ func main() {
 	r := mux.NewRouter()
 
 	userRepo := repositories.NewUserRepository(dbConn)
+	groupRepo := repositories.NewGroupRepository(dbConn)
 
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	userService := services.NewUserService(userRepo, timeoutContext)
+	groupService := services.NewGroupService(groupRepo, timeoutContext)
 
 	routes.NewUserHandler(r, userService)
+	routes.NewGroupHandler(r, groupService)
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(viper.GetString(`server.port`), r))
 }

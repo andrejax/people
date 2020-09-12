@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"people/interfaces"
 	"people/models"
 	er "people/utils/errors"
@@ -31,10 +32,11 @@ func (m *UserRepository) fetch(ctx context.Context, query string, args ...interf
 	for rows.Next() {
 		u := models.User{}
 		err = rows.Scan(
-			&u.ID,
+			&u.Id,
 			&u.Name,
 			&u.Email,
 			&u.Password,
+			&u.GroupId,
 		)
 
 		if err != nil {
@@ -48,8 +50,8 @@ func (m *UserRepository) fetch(ctx context.Context, query string, args ...interf
 }
 
 
-func (ur *UserRepository) Get(ctx context.Context, id int64)  (models.User, error) {
-	query := `SELECT id, name, email, password FROM user WHERE id = ?`
+func (ur *UserRepository) Get(ctx context.Context, id string)  (models.User, error) {
+	query := `SELECT id, name, email, password, group_id FROM user WHERE id = ?`
 
 	list, err := ur.fetch(ctx, query, id)
 	if err != nil {
@@ -64,7 +66,7 @@ func (ur *UserRepository) Get(ctx context.Context, id int64)  (models.User, erro
 }
 
 func (ur *UserRepository) List(ctx context.Context)  (res []models.User, err error) {
-	query := `SELECT id, name, email, password FROM user `
+	query := `SELECT id, name, email, password, group_id FROM user `
 	res, err = ur.fetch(ctx, query)
 	if err != nil {
 		return nil, err
@@ -74,14 +76,15 @@ func (ur *UserRepository) List(ctx context.Context)  (res []models.User, err err
 }
 
 func (ur *UserRepository) Add(ctx context.Context, u *models.User) (err error) {
-	query := `INSERT user SET name=? , email=? , password=?`
+	query := `INSERT user SET name=? , email=? , password=?, group_id=?`
 	stmt, err := ur.DB.PrepareContext(ctx, query)
 
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, u.Name, u.Email, u.Password)
+	log.Println(u.GroupId)
+	res, err := stmt.ExecContext(ctx, u.Name, u.Email, u.Password, u.GroupId)
 	if err != nil {
 		return
 	}
@@ -90,20 +93,20 @@ func (ur *UserRepository) Add(ctx context.Context, u *models.User) (err error) {
 	if err != nil {
 		return
 	}
-
-	u.ID = lastID
+	log.Println(lastID)
+	u.Id = string(lastID)
 	return
 }
 
 func (ur *UserRepository) Update(ctx context.Context, u *models.User) (err error) {
-	query := `UPDATE user set name=?, email=?, password=? WHERE ID = ?`
+	query := `UPDATE user set name=?, email=?, password=?, group_id=? WHERE Id = ?`
 
 	stmt, err := ur.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, u.Name, u.Email, u.Password, u.ID)
+	res, err := stmt.ExecContext(ctx, u.Name, u.Email, u.Password, u.Id, u.GroupId)
 	if err != nil {
 		return
 	}
@@ -121,7 +124,7 @@ func (ur *UserRepository) Update(ctx context.Context, u *models.User) (err error
 	return
 }
 
-func (ur *UserRepository) Remove(ctx context.Context, id int64) (err error) {
+func (ur *UserRepository) Remove(ctx context.Context, id string) (err error) {
 	query := "DELETE FROM user WHERE id = ?"
 
 	stmt, err := ur.DB.PrepareContext(ctx, query)
