@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: xUIuE0Ebky
+      MYSQL_DATABASE: people_db
+      MYSQL_USER: uDMFvbOlYT
+      MYSQL_PASSWORD: xUIuE0Ebky
+    container_name: people_db
+    ports:
+      - "3306:3306"
+  app:
+    build:
+      context: ./people
+    container_name: people_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    command: sh -c "/wait && /dist/main"
+    environment:
+      - WAIT_HOSTS=db:3306
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=10
+      - WAIT_HOST_CONNECT_TIMEOUT=30

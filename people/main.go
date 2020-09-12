@@ -24,6 +24,8 @@ func init() {
 
 func main() {
 
+	log.Println("Starting application...")
+
 	dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)
@@ -61,5 +63,6 @@ func main() {
 	routes.NewUserHandler(r, userService)
 	routes.NewGroupHandler(r, groupService)
 
+	log.Println("Listening on port: " + viper.GetString(`server.port`))
 	log.Fatal(http.ListenAndServe(viper.GetString(`server.port`), r))
 }

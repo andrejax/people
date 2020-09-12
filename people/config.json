@@ -6,10 +6,10 @@
     "timeout":2
   },
   "database": {
-    "host": "remotemysql.com",
+    "host": "db",
     "port": "3306",
     "user": "uDMFvbOlYT",
     "pass": "xUIuE0Ebky",
-    "name": "uDMFvbOlYT"
+    "name": "people_db"
   }
 }
