@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"people/interfaces"
 	"people/models"
@@ -34,14 +33,12 @@ func (u *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := u.UserService.Get(ctx,id)
 	if err == utils.NotFound {
-		log.Println(err.Error())
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound,err)
 		return
 	}
 
 	if err != nil {
-		log.Println(err.Error())
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled,err)
 		return
 	}
 
@@ -52,8 +49,7 @@ func (u *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	users, err := u.UserService.List(ctx)
 	if err != nil {
-		log.Println(err.Error())
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled,err)
 		return
 	}
 
@@ -65,15 +61,19 @@ func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 
-	if(user == models.User{} || !validators.IsEmailValid(user.Email) || user.Name == "" || user.Email == "" || user.Password == ""){
-		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
+	if(!validators.IsEmailValid(user.Email)){
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidEmailInput, utils.InvalidEmailInput)
+		return
+	}
+
+	if(user == models.User{}  || user.Name == "" || user.Email == "" || user.Password == ""){
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput, utils.InvalidParamInput)
 		return
 	}
 
 	err := u.UserService.Add(ctx, &user)
 	if err != nil {
-		log.Println(err.Error())
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled, err)
 		return
 	}
 
@@ -85,37 +85,46 @@ func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 
+	if !validators.IsEmailValid(user.Email){
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidEmailInput, utils.InvalidEmailInput)
+		return
+	}
+
+	if(user == models.User{}  || user.Name == "" || user.Email == "" || user.Password == ""){
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput, utils.InvalidParamInput)
+		return
+	}
+
 	err := u.UserService.Update(ctx, &user)
 
 	if err == utils.NotFound {
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound, err)
 		return
 	}
 
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, err, err)
 		return
 	}
 
-	utils.ResponseObject(w, http.StatusOK, nil)
+	utils.ResponseObject(w, http.StatusOK, user)
 }
 
 func (u *UserHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	log.Println(id)
 	ctx := r.Context()
 	err := u.UserService.Remove(ctx, id)
 
 	if err == utils.NotFound {
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound, err)
 		return
 	}
 
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled, err)
 		return
 	}
 
-	utils.ResponseObject(w, http.StatusOK, nil)
+	w.WriteHeader(http.StatusOK)
 }

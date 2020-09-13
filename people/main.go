@@ -23,24 +23,17 @@ func init() {
 	}
 }
 
-//func Middleware(h http.Handler) http.Handler {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		log.Println("middleware", r.URL)
-//		h.ServeHTTP(w, r)
-//	})
-//}
+
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			log.Println("SETTING HEADERS...")
 			w.Header().Set("Access-Control-Allow-Methods", "*")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Allow-Headers", "content-type")
 
 			if req.Method == http.MethodOptions {
-				log.Println("METHOD NAME IS OPTIONS")
 				return
 			}
-			log.Println("SERVING REQUEST")
+
 			next.ServeHTTP(w, req)
 		})
 }

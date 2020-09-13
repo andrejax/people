@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"people/models"
-	"people/tests"
+	"people/utils/mocks"
 	"strings"
 	"testing"
 )
@@ -23,7 +23,7 @@ func TestAddUser_Created(t *testing.T) {
 		Name:     "name",
 		Id:       "0",
 	}
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 	handler := UserHandler {
 		UserService: mockUserService,
 	}
@@ -50,7 +50,7 @@ func TestAddUser_ServerError(t *testing.T) {
 		Name:     "name",
 		Id:       "0",
 	}
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 	mockUserService.On("Add", mock.Anything, mock.AnythingOfType("*models.User")).Return(fmt.Errorf("Something went wrong."))
 
 	j, err := json.Marshal(mockUser)
@@ -77,7 +77,7 @@ func TestAddUser_MissingParameters_BadRequest(t *testing.T) {
 	}{
 		"test@google.com",
 	}
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 
 	j, err := json.Marshal(mockUser)
 	assert.NoError(t, err)
@@ -95,7 +95,7 @@ func TestAddUser_MissingParameters_BadRequest(t *testing.T) {
 }
 func TestRemoveUser_Success(t *testing.T){
 	id := "1"
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 	handler := UserHandler {
 		UserService: mockUserService,
 	}
@@ -122,7 +122,7 @@ func TestUpdateUser_Success(t *testing.T){
 		Name:     "name",
 		Id:       "0",
 	}
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 	handler := UserHandler {
 		UserService: mockUserService,
 	}
@@ -155,7 +155,7 @@ func TestListUsers_Succees(t *testing.T){
 	mockUsers := make([]models.User,0)
 	mockUsers = append(mockUsers, mockUser)
 
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 
 	mockUserService.On("List", mock.Anything).Return(mockUsers, nil)
 
@@ -180,7 +180,7 @@ func TestGetUser_Succees(t *testing.T){
 		Email:    "emtest",
 		Id:       "1",
 	}
-	mockUserService := new(tests.UserService)
+	mockUserService := new(mocks.UserService)
 
 	mockUserService.On("Get", mock.Anything, mockUser.Id).Return(mockUser, nil)
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/google/go-cmp/cmp"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"people/interfaces"
 	"people/models"
@@ -33,12 +32,12 @@ func (g *GroupHandler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	group, err := g.GroupService.Get(ctx,id)
 	if err == utils.NotFound {
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound, err)
 		return
 	}
 
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled, err)
 		return
 	}
 
@@ -46,12 +45,10 @@ func (g *GroupHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *GroupHandler) List(w http.ResponseWriter, r *http.Request) {
-	log.Println("EXECUTING LIST")
 	ctx := r.Context()
 	groups, err := g.GroupService.List(ctx)
 	if err != nil {
-		log.Println(err.Error())
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled, err)
 		return
 	}
 
@@ -64,13 +61,13 @@ func (g *GroupHandler) Add(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&group)
 
 	if(cmp.Equal(group,models.Group{}) || group.Name == "" ){
-		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput, utils.InvalidParamInput)
 		return
 	}
 
 	err := g.GroupService.Add(ctx, &group)
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled, err)
 		return
 	}
 
@@ -85,16 +82,16 @@ func (g *GroupHandler) Update(w http.ResponseWriter, r *http.Request) {
 	err := g.GroupService.Update(ctx, &group)
 
 	if err == utils.NotFound {
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound, err)
 		return
 	}
 
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	utils.ResponseObject(w, http.StatusOK, group)
 }
 
 func (g *GroupHandler) Remove(w http.ResponseWriter, r *http.Request) {
@@ -105,12 +102,12 @@ func (g *GroupHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	err := g.GroupService.Remove(ctx, id)
 
 	if err == utils.NotFound {
-		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound, err)
 		return
 	}
 
 	if err != nil {
-		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled,err)
 		return
 	}
 
