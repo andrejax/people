@@ -1,4 +1,4 @@
-package errors
+package utils
 
 import (
 	"encoding/json"
@@ -13,11 +13,13 @@ var (
 	ErrUnhandled = errors.New("Something went wrong")
 	)
 
+type ErrorMessage struct {
+	Message string 	`json:message`
+}
+
 func ResponseErrorMessage(wr http.ResponseWriter, status int, er error) {
-	eo := &struct{
-		Message string	`json:message`
-	}{
-		er.Error(),
+	eo := &ErrorMessage{
+		Message: er.Error(),
 	}
 	ResponseObject(wr, status, eo)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
+	_ "people/docs"
 	"people/repositories"
 	routes "people/routes"
 	"people/services"
@@ -22,8 +23,28 @@ func init() {
 	}
 }
 
-func main() {
+//func Middleware(h http.Handler) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//		log.Println("middleware", r.URL)
+//		h.ServeHTTP(w, r)
+//	})
+//}
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			log.Println("SETTING HEADERS...")
+			w.Header().Set("Access-Control-Allow-Methods", "*")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Headers", "content-type")
 
+			if req.Method == http.MethodOptions {
+				log.Println("METHOD NAME IS OPTIONS")
+				return
+			}
+			log.Println("SERVING REQUEST")
+			next.ServeHTTP(w, req)
+		})
+}
+func main() {
 	log.Println("Starting application...")
 
 	dbHost := viper.GetString(`database.host`)
@@ -63,6 +84,9 @@ func main() {
 	routes.NewUserHandler(r, userService)
 	routes.NewGroupHandler(r, groupService)
 
+	r.Use(CORSMiddleware)
+
 	log.Println("Listening on port: " + viper.GetString(`server.port`))
+
 	log.Fatal(http.ListenAndServe(viper.GetString(`server.port`), r))
 }

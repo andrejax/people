@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"people/interfaces"
 	"people/models"
-	"people/utils/errors"
+	"people/utils"
 	"people/utils/validators"
 )
 
@@ -19,11 +19,12 @@ func NewUserHandler(r *mux.Router, us interfaces.UserService ){
 	handler := &UserHandler{
 		UserService: us,
 	}
-	r.HandleFunc("/users", handler.List).Methods("GET")
-	r.HandleFunc("/users/{id:[0-9]+}", handler.Get).Methods("GET")
-	r.HandleFunc("/users", handler.Add).Methods("POST")
-	r.HandleFunc("/users/{id:[0-9]+}", handler.Update).Methods("PUT")
-	r.HandleFunc("/users/{id:[0-9]+}", handler.Remove).Methods("DELETE")
+	r.HandleFunc("/users", handler.List).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/users/{id:[0-9]+}", handler.Get).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/users", handler.Add).Methods(http.MethodPost)
+	r.HandleFunc("/users", handler.Update).Methods(http.MethodPut)
+	r.HandleFunc("/users/{id:[0-9]+}", handler.Remove).Methods(http.MethodDelete)
+
 }
 
 func (u *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
@@ -32,19 +33,19 @@ func (u *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user, err := u.UserService.Get(ctx,id)
-	if err == errors.NotFound {
+	if err == utils.NotFound {
 		log.Println(err.Error())
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
 		log.Println(err.Error())
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusOK, user);
+	utils.ResponseObject(w, http.StatusOK, user);
 }
 
 func (u *UserHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -52,11 +53,11 @@ func (u *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	users, err := u.UserService.List(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusOK, users)
+	utils.ResponseObject(w, http.StatusOK, users)
 }
 
 func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -65,18 +66,18 @@ func (u *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&user)
 
 	if(user == models.User{} || !validators.IsEmailValid(user.Email) || user.Name == "" || user.Email == "" || user.Password == ""){
-		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
 		return
 	}
 
 	err := u.UserService.Add(ctx, &user)
 	if err != nil {
 		log.Println(err.Error())
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusCreated, user)
+	utils.ResponseObject(w, http.StatusCreated, user)
 }
 
 func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -86,17 +87,17 @@ func (u *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	err := u.UserService.Update(ctx, &user)
 
-	if err == errors.NotFound {
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+	if err == utils.NotFound {
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	utils.ResponseObject(w, http.StatusOK, nil)
 }
 
 func (u *UserHandler) Remove(w http.ResponseWriter, r *http.Request) {
@@ -106,15 +107,15 @@ func (u *UserHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	err := u.UserService.Remove(ctx, id)
 
-	if err == errors.NotFound {
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+	if err == utils.NotFound {
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	utils.ResponseObject(w, http.StatusOK, nil)
 }

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"people/interfaces"
 	"people/models"
-	"people/utils/errors"
+	"people/utils"
 )
 
 type GroupHandler struct {
@@ -19,11 +19,11 @@ func NewGroupHandler(r *mux.Router, gr interfaces.GroupService ){
 	handler := &GroupHandler{
 		GroupService: gr,
 	}
-	r.HandleFunc("/groups", handler.List).Methods("GET")
-	r.HandleFunc("/groups/{id:[0-9]+}", handler.Get).Methods("GET")
-	r.HandleFunc("/groups", handler.Add).Methods("POST")
-	r.HandleFunc("/groups/{id:[0-9]+}", handler.Update).Methods("PUT")
-	r.HandleFunc("/groups/{id:[0-9]+}", handler.Remove).Methods("DELETE")
+	r.HandleFunc("/groups", handler.List).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/groups/{id:[0-9]+}", handler.Get).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/groups", handler.Add).Methods(http.MethodPost)
+	r.HandleFunc("/groups", handler.Update).Methods(http.MethodPut)
+	r.HandleFunc("/groups/{id:[0-9]+}", handler.Remove).Methods(http.MethodDelete)
 }
 
 func (g *GroupHandler) Get(w http.ResponseWriter, r *http.Request) {
@@ -32,29 +32,30 @@ func (g *GroupHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	group, err := g.GroupService.Get(ctx,id)
-	if err == errors.NotFound {
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+	if err == utils.NotFound {
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusOK, group);
+	utils.ResponseObject(w, http.StatusOK, group);
 }
 
 func (g *GroupHandler) List(w http.ResponseWriter, r *http.Request) {
+	log.Println("EXECUTING LIST")
 	ctx := r.Context()
 	groups, err := g.GroupService.List(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusOK, groups)
+	utils.ResponseObject(w, http.StatusOK, groups)
 }
 
 func (g *GroupHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -63,17 +64,17 @@ func (g *GroupHandler) Add(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&group)
 
 	if(cmp.Equal(group,models.Group{}) || group.Name == "" ){
-		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
 		return
 	}
 
 	err := g.GroupService.Add(ctx, &group)
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 
-	errors.ResponseObject(w, http.StatusCreated, group)
+	utils.ResponseObject(w, http.StatusCreated, group)
 }
 
 func (g *GroupHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -83,13 +84,13 @@ func (g *GroupHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	err := g.GroupService.Update(ctx, &group)
 
-	if err == errors.NotFound {
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+	if err == utils.NotFound {
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusBadRequest, errors.InvalidParamInput)
+		utils.ResponseErrorMessage(w, http.StatusBadRequest, utils.InvalidParamInput)
 		return
 	}
 
@@ -103,13 +104,13 @@ func (g *GroupHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	err := g.GroupService.Remove(ctx, id)
 
-	if err == errors.NotFound {
-		errors.ResponseErrorMessage(w, http.StatusNotFound, errors.NotFound)
+	if err == utils.NotFound {
+		utils.ResponseErrorMessage(w, http.StatusNotFound, utils.NotFound)
 		return
 	}
 
 	if err != nil {
-		errors.ResponseErrorMessage(w, http.StatusInternalServerError, errors.ErrUnhandled)
+		utils.ResponseErrorMessage(w, http.StatusInternalServerError, utils.ErrUnhandled)
 		return
 	}
 

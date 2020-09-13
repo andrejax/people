@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -32,7 +33,7 @@ func TestAddUser_Created(t *testing.T) {
 
 	mockUserService.On("Add", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
-	req, err := http.NewRequest(echo.POST, "/users", strings.NewReader(string(j)))
+	req, err := http.NewRequest(echo.POST, "/users", bytes.NewReader(j))
 	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
@@ -55,7 +56,7 @@ func TestAddUser_ServerError(t *testing.T) {
 	j, err := json.Marshal(mockUser)
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest(echo.POST, "/users", strings.NewReader(string(j)))
+	req, err := http.NewRequest(echo.POST, "/users", bytes.NewReader(j))
 	assert.NoError(t, err)
 
 
@@ -81,7 +82,7 @@ func TestAddUser_MissingParameters_BadRequest(t *testing.T) {
 	j, err := json.Marshal(mockUser)
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest(echo.POST, "/users", strings.NewReader(string(j)))
+	req, err := http.NewRequest(echo.POST, "/users", bytes.NewReader(j))
 	assert.NoError(t, err)
 
 	handler := UserHandler {
@@ -131,7 +132,7 @@ func TestUpdateUser_Success(t *testing.T){
 
 	mockUserService.On("Update", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
-	req, err := http.NewRequest(echo.POST, "/users", strings.NewReader(string(j)))
+	req, err := http.NewRequest(echo.POST, "/users", bytes.NewReader(j))
 	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
@@ -183,7 +184,7 @@ func TestGetUser_Succees(t *testing.T){
 
 	mockUserService.On("Get", mock.Anything, mockUser.Id).Return(mockUser, nil)
 
-	req, err := http.NewRequest(echo.GET, "/users/"+string(mockUser.Id), strings.NewReader(""))
+	req, err := http.NewRequest(echo.GET, "/users/"+mockUser.Id, strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()

@@ -7,7 +7,8 @@ import (
 	"log"
 	"people/interfaces"
 	"people/models"
-	er "people/utils/errors"
+	"people/utils"
+	"strconv"
 )
 
 type UserRepository struct {
@@ -62,7 +63,7 @@ func (ur *UserRepository) Get(ctx context.Context, id string)  (models.User, err
 		return list[0], nil
 	}
 
-	return models.User{}, er.NotFound
+	return models.User{}, utils.NotFound
 }
 
 func (ur *UserRepository) List(ctx context.Context)  (res []models.User, err error) {
@@ -83,6 +84,8 @@ func (ur *UserRepository) Add(ctx context.Context, u *models.User) (err error) {
 		return
 	}
 
+	// Error 1452: Cannot add or update a child row: a foreign key constraint fails (`people_db`.`user`, CONSTRAINT `user_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `users_group` (`id`) ON DELETE SET NULL)
+
 	log.Println(u.GroupId)
 	res, err := stmt.ExecContext(ctx, u.Name, u.Email, u.Password, u.GroupId)
 	if err != nil {
@@ -94,7 +97,7 @@ func (ur *UserRepository) Add(ctx context.Context, u *models.User) (err error) {
 		return
 	}
 	log.Println(lastID)
-	u.Id = string(lastID)
+	u.Id = strconv.FormatInt(lastID, 10)
 	return
 }
 

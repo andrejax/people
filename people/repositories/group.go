@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"people/interfaces"
 	"people/models"
-	er "people/utils/errors"
+	"people/utils"
+	"strconv"
 )
 
 type GroupRepository struct {
@@ -58,7 +59,7 @@ func (gr *GroupRepository) Get(ctx context.Context, id string)  (models.Group, e
 		return list[0], nil
 	}
 
-	return models.Group{}, er.NotFound
+	return models.Group{}, utils.NotFound
 }
 
 func (gr *GroupRepository) List(ctx context.Context)  (res []models.Group, err error) {
@@ -89,7 +90,7 @@ func (gr *GroupRepository) Add(ctx context.Context, g *models.Group) (err error)
 		return
 	}
 
-	g.Id = string(lastID)
+	g.Id = strconv.FormatInt(lastID, 10)
 	return
 }
 
